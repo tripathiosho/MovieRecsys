@@ -1,8 +1,6 @@
 import pickle
 import streamlit as st
 import requests
-import numpy as np
-from scipy.sparse import csr_matrix
 
 # Fetch poster based on movie_id
 def fetch_poster(movie_id):
@@ -22,7 +20,7 @@ def fetch_poster(movie_id):
 def recommend(movie):
     try:
         index = movies[movies['title'] == movie].index[0]
-        similarity_row = similarity[index].toarray().flatten()  # Get dense row from sparse matrix
+        similarity_row = similarity[index]  # Access the specific row
         distances = sorted(list(enumerate(similarity_row)), reverse=True, key=lambda x: x[1])
         recommended_movie_names = []
         recommended_movie_posters = []
@@ -46,9 +44,8 @@ st.header('Movie Recommender System')
 # Load movies data
 movies = pickle.load(open('movie_list.pkl', 'rb'))
 
-# Load the similarity matrix as sparse for memory efficiency
-similarity_dense = pickle.load(open('similarity.pkl', 'rb'))
-similarity = csr_matrix(similarity_dense)  # Convert to sparse matrix
+# Load the similarity matrix (dense format)
+similarity = pickle.load(open('similarity.pkl', 'rb'))
 
 # Select movie
 movie_list = movies['title'].values
